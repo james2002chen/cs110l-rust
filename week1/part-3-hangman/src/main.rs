@@ -29,33 +29,34 @@ fn pick_a_random_word() -> String {
 
 fn main() {
     let secret_word = pick_a_random_word();
-    // Note: given what you know about Rust so far, it's easier to pull characters out of a
-    // vector than it is to pull them out of a string. You can get the ith character of
-    // secret_word by doing secret_word_chars[i].
 
+    // Note: given what you know about Rust so far, it's easier to pull characters out of a vector than it is to pull them out of a string. You can get the ith character of secret_word by doing secret_word_chars[i].
     let secret_word_chars: Vec<char> = secret_word.chars().collect();
-    let mut mask = vec![false; secret_word_chars.len()];
 
-    // Uncomment for debugging:
     //println!("random word: {}", secret_word);
-
-    // Your code here! :)
+    let mut mask = vec![false; secret_word_chars.len()];
     let mut num = 0;
     loop {
+
         print!("Please guess a letter: ");
+
         // Make sure the prompt from the previous line gets displayed:
         io::stdout()
             .flush()
             .expect("Error flushing stdout.");
+
         let mut guess = String::new();
+
         io::stdin()
             .read_line(&mut guess)
             .expect("Error reading line.");
         //print!("{}",guess);
 
-        let ch = guess.chars().nth(0);
-        let mut i = 0;
+        let guess:char = guess.chars().next().unwrap();
+        if !guess.is_ascii_lowercase() { break; }
+
         let mut newly_guessed = false;
+        /*
         while i < secret_word_chars.len() {
             if ch == Some(secret_word_chars[i]) {
                 if mask[i] == false {
@@ -65,6 +66,16 @@ fn main() {
             }
             i += 1;
         }
+        */
+
+        for (i, &item) in secret_word_chars.iter().enumerate() {
+            if item == guess {
+                if !mask[i] { 
+                    newly_guessed = true;
+                    mask[i] = true;
+                }
+            }
+        }
         if !newly_guessed {
             num += 1;
         }
@@ -72,8 +83,17 @@ fn main() {
             println!("YOU FAILED");
             break;
         }
-        i = 0;
         let mut all_guessed = true;
+        for (i, &item) in secret_word_chars.iter().enumerate() {
+            if mask[i] {
+                print!("{}",item);
+            }
+            else {
+                all_guessed = false;
+                print!("_");
+            }
+        }
+        /*
         while i < secret_word_chars.len() {
             if mask[i] {
                 print!("{}",secret_word_chars[i]);
@@ -84,6 +104,7 @@ fn main() {
             }
             i += 1;
         }
+        */
         print!("\n");
         if all_guessed {
             println!("YOU WIN");
