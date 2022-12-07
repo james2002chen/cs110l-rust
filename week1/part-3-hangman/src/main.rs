@@ -32,9 +32,68 @@ fn main() {
     // Note: given what you know about Rust so far, it's easier to pull characters out of a
     // vector than it is to pull them out of a string. You can get the ith character of
     // secret_word by doing secret_word_chars[i].
+
     let secret_word_chars: Vec<char> = secret_word.chars().collect();
+    let mut mask = vec![false; secret_word_chars.len()];
+
     // Uncomment for debugging:
-    // println!("random word: {}", secret_word);
+    //println!("random word: {}", secret_word);
 
     // Your code here! :)
+    let mut num = 0;
+    loop {
+        print!("Please guess a letter: ");
+        // Make sure the prompt from the previous line gets displayed:
+        io::stdout()
+            .flush()
+            .expect("Error flushing stdout.");
+        let mut guess = String::new();
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Error reading line.");
+        //print!("{}",guess);
+
+        let ch = guess.chars().nth(0);
+        let mut i = 0;
+        let mut newly_guessed = false;
+        while i < secret_word_chars.len() {
+            if ch == Some(secret_word_chars[i]) {
+                if mask[i] == false {
+                    newly_guessed = true;
+                    mask[i] = true;
+                }
+            }
+            i += 1;
+        }
+        if !newly_guessed {
+            num += 1;
+        }
+        if num >= NUM_INCORRECT_GUESSES {
+            println!("YOU FAILED");
+            break;
+        }
+        i = 0;
+        let mut all_guessed = true;
+        while i < secret_word_chars.len() {
+            if mask[i] {
+                print!("{}",secret_word_chars[i]);
+            }
+            else {
+                all_guessed = false;
+                print!("_");
+            }
+            i += 1;
+        }
+        print!("\n");
+        if all_guessed {
+            println!("YOU WIN");
+            break;
+        } else {
+            println!("chances left:{}",NUM_INCORRECT_GUESSES-num);
+        }
+        io::stdout()
+            .flush()
+            .expect("Error flushing stdout.");
+    }
+
 }
